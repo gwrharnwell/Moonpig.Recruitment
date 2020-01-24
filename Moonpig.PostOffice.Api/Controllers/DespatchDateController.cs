@@ -10,26 +10,40 @@
     [Route("api/[controller]")]
     public class DespatchDateController : Controller
     {
-        public DateTime _mlt;
+        private readonly IDbContext _cxt;
+        public DespatchDateController(IDbContext cxt)
+        {
+            _cxt = cxt;
+        }
 
         [HttpGet]
         public DespatchDate Get(List<int> productIds, DateTime orderDate)
         {
-            _mlt = orderDate; // max lead time
+            var _mlt = orderDate; // max lead time
+
             foreach (var ID in productIds)
             {
-                DbContext dbContext = new DbContext();
-                var s = dbContext.Products.Single(x => x.ProductId == ID).SupplierId;
-                var lt = dbContext.Suppliers.Single(x => x.SupplierId == s).LeadTime;
+                var s = _cxt.Products.SingleOrDefault(x => x.ProductId == ID).SupplierId;
+                var lt = _cxt.Suppliers.SingleOrDefault(x => x.SupplierId == s).LeadTime;
+
                 if (orderDate.AddDays(lt) > _mlt)
+                {
                     _mlt = orderDate.AddDays(lt);
+                }
             }
+
             if (_mlt.DayOfWeek == DayOfWeek.Saturday)
             {
                 return new DespatchDate { Date = _mlt.AddDays(2) };
             }
-            else if (_mlt.DayOfWeek == DayOfWeek.Sunday) return new DespatchDate { Date = _mlt.AddDays(1) };
-            else return new DespatchDate { Date = _mlt };
+            else if (_mlt.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return new DespatchDate { Date = _mlt.AddDays(1) };
+            }
+            else
+            {
+                return new DespatchDate { Date = _mlt };
+            }
         }
     }
 }
