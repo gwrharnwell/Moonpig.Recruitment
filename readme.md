@@ -98,15 +98,37 @@ document.
 
 ## Questions
 
-Q1. What 'code smells' / anti-patterns did you find in the existing 
-	implemention of part 1 & 2?
+Q1. What 'code smells' / anti-patterns did you find in the existing implemention of part 1 & 2?
+* The DateTime _mlt variable should probably just be a local variable and not defined at the class level as it’s only used/only relevant to the Get method
+* The DespatchDateController was creating a new instance over the DbContext class and was therefore tightly coupled to the DbContext class, rather than implementing the IDbContext interface. This would make it painful when switching out data providers. 
+* The Product and Supplier models were defined inside the data project, but they’d likely be used elsewhere in the solution and therefore any other project wishing to use the models would need to be coupled to the data project.
+* The GET method uses the LINQ Single() method multiple times, which throws an exception if an element doesn’t exist in a collection. The code then also tries to access properties of the fetched elements (SupplierID, LeadTime) without first checking if the elements aren’t null
+* GET method was returning in multiple places when checking the day of the week. Better to return once where possible.
+* The code was adding all of the supplier lead times on to the order date. So if there was a product with a lead time of 1 day, and a product with a lead time of 2 days then 3 days would have been added on to the order date instead of 2. 
+Added additional fields to the DespatchDate object to inform users of any errors - whilst keeping the original structure intact (open for extension)/
+* The test methods were using dynamic days (DateTime.Now) and expecting a result by just adding a day which is unpredictable. I’ve changed them to use the dates laid out in the Acceptance Criteria
+Added extra unit tests to support Parts 2 and 3.
 
 Q2. What best pracices have you used while implementing your solution?
+* Dependency Inversion Principle - It’s important that solutions use interfaces where possible, to avoid tightly coupled code.
+* Added Instance Constructor to DespatchDate. Better to have one place to create new instances of an object.
+* I needed to use my EnsureDateIsWeekDay functionality multiple times so I extracted this to its own helper class, adhering to the DRY principal. 
+* Clearly laid out code
+* Refrained from writing long, complex methods and tried to refactor where possible.
+* Consistent use of camel case for local variables, and starting private members with an underscore. Variables and method names are also clearly named.
+* Clearly commented code (both inline and XML comments on new methods).
+* Cleared unused code
+
 
 Q3. What further steps would you take to improve the solution given more time?
+* I’d introduce a Services layer that would sit between the Controllers and the Data Access classes. These services would take care of the business logic, such as looking up products and suppliers and calculating despatch dates. This way the controller would just route the query to a service, keeping the business logic in the controller actions to a minimum. 
+* The solution should also take public holidays into account. It could discover these using an external API (a gov.uk dataset, for example).
+* Could probably extend the standard DateTime class and add my datetime calculation methods for adding business days and ensuring a day is a weekday. 
+* GET method’s return signature is DespatchDate. I prefer to always return an ActionResult or ActionResult<T> to take advantage of the built in status code returns. For example I’ve would return a NotFound() response if a product id was provided which doesn’t exist.
 
 Q4. What's a technology that you're excited about and where do you see this 
     being applicable? (Your answer does not have to be related to this problem)
+* The number one thing I’m excited about right now is Blazor. Blazor allows C# developers to be able to write dynamic and interactive front end web apps, in a way similar to the likes of React, Vue.js and so on, with very minimal javascript knowledge. The ability to be able to create cutting edge, single page web applications whilst still writing C# code is fascinating to me. I’ve been writing Blazor applications in my own time for about a year now and I’ve been closely following the roadmap and the features the team have been bringing out in each release. It’s clear Microsoft are listening to the dev community and they realise there’s a real need for .NET developers to be able to write front end, REST API driven web applications. I’m confident it’s going to improve the speed and quality of the applications I write going forward, and actually make front end development more enjoyable! 
 
 ## Request and Response Examples
 
