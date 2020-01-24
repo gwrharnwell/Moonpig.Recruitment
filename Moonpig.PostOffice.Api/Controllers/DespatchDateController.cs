@@ -17,33 +17,46 @@
         }
 
         [HttpGet]
-        public DespatchDate Get(List<int> productIds, DateTime orderDate)
+        public IActionResult Get(List<int> productIds, DateTime orderDate)
         {
-            var _mlt = orderDate; // max lead time
-
             foreach (var ID in productIds)
             {
-                var s = _cxt.Products.SingleOrDefault(x => x.ProductId == ID).SupplierId;
-                var lt = _cxt.Suppliers.SingleOrDefault(x => x.SupplierId == s).LeadTime;
+                //Find product by ID
+                var product = _cxt.Products.SingleOrDefault(x => x.ProductId == ID);
 
-                if (orderDate.AddDays(lt) > _mlt)
+                //Check if product exists
+                if (product == null)
                 {
-                    _mlt = orderDate.AddDays(lt);
+                    //Couldn't find this product, return NotFound message to the client
+                    return NotFound($"Product: { ID } doesn't exist");
+                }
+
+                //Find supplier by product supplier ID
+                var supplier = _cxt.Suppliers.SingleOrDefault(x => x.SupplierId == product.SupplierId);
+
+                //Check supplier exists
+                if (supplier == null)
+                {
+                    //Couldn't find supplier - return NotFound message to client
+                    return NotFound("There was a problem with one of our suppliers. We currently can't provide a despatch date.");
+                }
+
+
+                if (orderDate.AddDays(supplier.LeadTime) > orderDate)
+                {
+                    orderDate = orderDate.AddDays(supplier.LeadTime);
                 }
             }
 
-            if (_mlt.DayOfWeek == DayOfWeek.Saturday)
-            {
-                return new DespatchDate { Date = _mlt.AddDays(2) };
-            }
-            else if (_mlt.DayOfWeek == DayOfWeek.Sunday)
-            {
-                return new DespatchDate { Date = _mlt.AddDays(1) };
-            }
-            else
-            {
-                return new DespatchDate { Date = _mlt };
-            }
+            var despatchDate = orderDate;
+
+            //Determine whether or not extra days need to be added on to the despatch date due to weekend
+            if (orderDate.DayOfWeek == DayOfWeek.Saturday)
+                despatchDate = orderDate.AddDays(2);
+            else if (orderDate.DayOfWeek == DayOfWeek.Sunday)
+                despatchDate = orderDate.AddDays(1);
+
+            return Ok(new DespatchDate(despatchDate));
         }
     }
 }
