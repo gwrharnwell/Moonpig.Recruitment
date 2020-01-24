@@ -18,12 +18,12 @@
         }
 
         [HttpGet]
-        public IActionResult Get(List<int> productIds, DateTime orderDate)
+        public DespatchDate Get(List<int> productIds, DateTime orderDate)
         {
             //Ensure at least one product has been specified
             if (productIds == null || !productIds.Any())
             {
-                return BadRequest("Please provide at least one valid product ID");
+                return new DespatchDate(orderDate, "Please provide at least one valid product ID");
             }
 
             //Ensure we start calculating from a weekday
@@ -39,7 +39,7 @@
                 if (product == null)
                 {
                     //Couldn't find this product, return NotFound message to the client
-                    return NotFound($"Product: { ID } doesn't exist");
+                    return new DespatchDate(orderDate, $"Product: { ID } doesn't exist");
                 }
 
                 //Find supplier by product supplier ID
@@ -49,7 +49,7 @@
                 if (supplier == null)
                 {
                     //Couldn't find supplier - return NotFound message to client
-                    return NotFound("There was a problem with one of our suppliers. We currently can't provide a despatch date.");
+                    return new DespatchDate(orderDate, "There was a problem with one of our suppliers. We currently can't provide a despatch date.");
                 }
 
                 //Check if this supplier has the longest lead time
@@ -63,7 +63,7 @@
             var dispatchDate = DateCalculationHelper.AddBusinessDaysToDate(orderDate, longestLeadTime);
 
             //Wrap object in OK result and return to client
-            return Ok(new DespatchDate(dispatchDate));
+            return new DespatchDate(dispatchDate);
         }
 
     }

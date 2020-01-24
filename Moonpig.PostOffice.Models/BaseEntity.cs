@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Moonpig.PostOffice.Models
 {
-    public class BaseEntity
+    public abstract class BaseEntity
     {
         public string Name { get; set; }
     }
