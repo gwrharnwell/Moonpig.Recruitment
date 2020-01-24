@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Moonpig.PostOffice.Data\Moonpig.PostOffice.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>

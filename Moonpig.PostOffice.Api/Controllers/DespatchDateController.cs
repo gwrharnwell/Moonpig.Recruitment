@@ -6,6 +6,7 @@
     using Data;
     using Microsoft.AspNetCore.Mvc;
     using Model;
+    using Moonpig.PostOffice.Api.Helpers;
 
     [Route("api/[controller]")]
     public class DespatchDateController : Controller
@@ -26,7 +27,7 @@
             }
 
             //Ensure we start calculating from a weekday
-            orderDate = EnsureDateIsWeekDay(orderDate);
+            orderDate = DateCalculationHelper.EnsureDateIsWeekDay(orderDate);
 
             int longestLeadTime = 0;
             foreach (var ID in productIds)
@@ -59,33 +60,11 @@
             }
 
             //Calculate final dispatch date
-            var dispatchDate = AddBusinessDaysToDate(orderDate, longestLeadTime);
+            var dispatchDate = DateCalculationHelper.AddBusinessDaysToDate(orderDate, longestLeadTime);
 
             //Wrap object in OK result and return to client
             return Ok(new DespatchDate(dispatchDate));
         }
 
-        private DateTime EnsureDateIsWeekDay(DateTime dt)
-        {
-            var daysToAdd = 0;
-
-            if (dt.DayOfWeek == DayOfWeek.Saturday)
-                daysToAdd = 2;
-            else if (dt.DayOfWeek == DayOfWeek.Sunday)
-                daysToAdd = 1;
-
-            return dt.AddDays(daysToAdd);
-        }
-
-        private DateTime AddBusinessDaysToDate(DateTime dt, int numOfDays)
-        {
-            for(var i = 0; i < numOfDays; i++)
-            {
-                //Add 1 day to date, being sure to skip weekend days
-                dt = EnsureDateIsWeekDay(dt.AddDays(1));
-            }
-
-            return dt;
-        }
     }
 }
