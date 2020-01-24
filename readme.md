@@ -122,6 +122,7 @@ Q2. What best pracices have you used while implementing your solution?
 
 
 Q3. What further steps would you take to improve the solution given more time?
+* Add error catching and logging mechanisms. As it stands any exceptions will just return a 500 to the client.
 * I’d introduce a Services layer that would sit between the Controllers and the Data Access classes. These services would take care of the business logic, such as looking up products and suppliers and calculating despatch dates. This way the controller would just route the query to a service, keeping the business logic in the controller actions to a minimum. 
 * The solution should also take public holidays into account. It could discover these using an external API (a gov.uk dataset, for example).
 * Could probably extend the standard DateTime class and add my datetime calculation methods for adding business days and ensuring a day is a weekday. 
