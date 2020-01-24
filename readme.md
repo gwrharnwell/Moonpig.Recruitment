@@ -110,10 +110,11 @@ Added additional fields to the DespatchDate object to inform users of any errors
 Added extra unit tests to support Parts 2 and 3.
 
 Q2. What best pracices have you used while implementing your solution?
-* Dependency Inversion Principle - It’s important that solutions use interfaces where possible, to avoid tightly coupled code.
+* Controller uses interface rather than concrete instance of DBContext. It’s important that solutions use interfaces where possible, to avoid tightly coupled code.
 * Added Instance Constructor to DespatchDate. Better to have one place to create new instances of an object.
 * I needed to use my EnsureDateIsWeekDay functionality multiple times so I extracted this to its own helper class, adhering to the DRY principal. 
 * Clearly laid out code
+* Methods perform one action well.
 * Refrained from writing long, complex methods and tried to refactor where possible.
 * Consistent use of camel case for local variables, and starting private members with an underscore. Variables and method names are also clearly named.
 * Clearly commented code (both inline and XML comments on new methods).
