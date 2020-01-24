@@ -19,9 +19,16 @@
         [HttpGet]
         public IActionResult Get(List<int> productIds, DateTime orderDate)
         {
+            //Ensure at least one product has been specified
+            if (productIds == null || !productIds.Any())
+            {
+                return BadRequest("Please provide at least one valid product ID");
+            }
+
             //Ensure we start calculating from a weekday
             orderDate = EnsureDateIsWeekDay(orderDate);
 
+            int longestLeadTime = 0;
             foreach (var ID in productIds)
             {
                 //Find product by ID
@@ -44,18 +51,18 @@
                     return NotFound("There was a problem with one of our suppliers. We currently can't provide a despatch date.");
                 }
 
-
-                if (orderDate.AddDays(supplier.LeadTime) > orderDate)
+                //Check if this supplier has the longest lead time
+                if (supplier.LeadTime > longestLeadTime)
                 {
-                    orderDate = orderDate.AddDays(supplier.LeadTime);
+                    longestLeadTime = supplier.LeadTime;
                 }
             }
 
-            //Determine whether or not extra days need to be added on to the despatch date due to weekend
-            var despatchDate = EnsureDateIsWeekDay(orderDate);
+            //Calculate final dispatch date
+            var dispatchDate = AddBusinessDaysToDate(orderDate, longestLeadTime);
 
             //Wrap object in OK result and return to client
-            return Ok(new DespatchDate(despatchDate));
+            return Ok(new DespatchDate(dispatchDate));
         }
 
         private DateTime EnsureDateIsWeekDay(DateTime dt)
@@ -68,6 +75,17 @@
                 daysToAdd = 1;
 
             return dt.AddDays(daysToAdd);
+        }
+
+        private DateTime AddBusinessDaysToDate(DateTime dt, int numOfDays)
+        {
+            for(var i = 0; i < numOfDays; i++)
+            {
+                //Add 1 day to date, being sure to skip weekend days
+                dt = EnsureDateIsWeekDay(dt.AddDays(1));
+            }
+
+            return dt;
         }
     }
 }
