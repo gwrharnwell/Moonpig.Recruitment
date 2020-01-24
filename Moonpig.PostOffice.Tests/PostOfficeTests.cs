@@ -17,6 +17,14 @@
             var date = controller.Get(new List<int>() { 1 }, new DateTime(2018, 01, 01));
             date.Date.Date.ShouldBe(new DateTime(2018, 01, 02));
         }
+        [Fact]
+        public void OneProductWithLeadTimeOfOneDayRecievedOnSaturday()
+        {
+            IDbContext cxt = new DbContext();
+            DespatchDateController controller = new DespatchDateController(cxt);
+            var date = controller.Get(new List<int>() { 1 }, new DateTime(2020, 01, 25));
+            date.Date.Date.ShouldBe(new DateTime(2020, 01, 28));
+        }
 
         [Fact]
         public void OneProductWithLeadTimeOfTwoDay()
