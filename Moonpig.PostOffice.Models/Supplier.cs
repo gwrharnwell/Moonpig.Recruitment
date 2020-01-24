@@ -4,13 +4,9 @@ using System.Text;
 
 namespace Moonpig.PostOffice.Models
 {
-    public class Supplier
+    public class Supplier : BaseEntity
     {
         public int SupplierId { get; set; }
-
-
-        public string Name { get; set; }
-
 
         public int LeadTime { get; set; }
 
