@@ -2,6 +2,7 @@
 {
     using System.Linq;
     using System.Collections.Generic;
+    using Moonpig.PostOffice.Models;
 
     public class DbContext : IDbContext
     {

@@ -1,5 +1,6 @@
 ﻿namespace Moonpig.PostOffice.Data
 {
+    using Moonpig.PostOffice.Models;
     using System.Linq;
 
     public interface IDbContext

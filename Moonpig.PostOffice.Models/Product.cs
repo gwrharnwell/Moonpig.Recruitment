@@ -1,4 +1,6 @@
-﻿namespace Moonpig.PostOffice.Data
+﻿using System;
+
+namespace Moonpig.PostOffice.Models
 {
     public class Product
     {
