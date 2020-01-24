@@ -19,6 +19,9 @@
         [HttpGet]
         public IActionResult Get(List<int> productIds, DateTime orderDate)
         {
+            //Ensure we start calculating from a weekday
+            orderDate = EnsureDateIsWeekDay(orderDate);
+
             foreach (var ID in productIds)
             {
                 //Find product by ID
@@ -48,15 +51,23 @@
                 }
             }
 
-            var despatchDate = orderDate;
-
             //Determine whether or not extra days need to be added on to the despatch date due to weekend
-            if (orderDate.DayOfWeek == DayOfWeek.Saturday)
-                despatchDate = orderDate.AddDays(2);
-            else if (orderDate.DayOfWeek == DayOfWeek.Sunday)
-                despatchDate = orderDate.AddDays(1);
+            var despatchDate = EnsureDateIsWeekDay(orderDate);
 
+            //Wrap object in OK result and return to client
             return Ok(new DespatchDate(despatchDate));
+        }
+
+        private DateTime EnsureDateIsWeekDay(DateTime dt)
+        {
+            var daysToAdd = 0;
+
+            if (dt.DayOfWeek == DayOfWeek.Saturday)
+                daysToAdd = 2;
+            else if (dt.DayOfWeek == DayOfWeek.Sunday)
+                daysToAdd = 1;
+
+            return dt.AddDays(daysToAdd);
         }
     }
 }
