@@ -11,7 +11,7 @@
     [Route("api/[controller]")]
     public class DespatchDateController : Controller
     {
-        private readonly IDbContext _cxt;
+        private IDbContext _cxt;
         public DespatchDateController(IDbContext cxt)
         {
             _cxt = cxt;
@@ -62,7 +62,6 @@
             //Calculate final dispatch date
             var dispatchDate = DateCalculationHelper.AddBusinessDaysToDate(orderDate, longestLeadTime);
 
-            //Wrap object in OK result and return to client
             return new DespatchDate(dispatchDate);
         }
 
